@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Verification</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        .btn-primary { background-color: #0f172a; border: none; padding: 12px; font-weight: bold; }
+        .btn-primary:hover { background-color: #1e293b; }
+    </style>
+</head>
+<body>
+    <div class="card p-5">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark">Profile Verification</h2>
+            <p class="text-muted small">Please provide your license and age details to rent a vehicle.</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} text-center" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">Driver's License Number</label>
+                {{ form.license_number }} 
+                <script>
+                    document.querySelector('input[name="license_number"]').className += ' form-control';
+                </script>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Age</label>
+                {{ form.age }}
+                <script>
+                    document.querySelector('input[name="age"]').className += ' form-control';
+                </script>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 rounded-pill">Save & Continue</button>
+        </form>
+    </div>
+</body>
+</html>

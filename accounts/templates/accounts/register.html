@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up - Rent A Car</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .register-card { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 450px; background: white; padding: 40px; }
+        .btn-brand { background-color: #ff5a00; color: white; font-weight: 600; border-radius: 10px; padding: 12px; border: none; width: 100%; }
+        .btn-brand:hover { background-color: #e04e00; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <h3 class="text-center fw-bold mb-4">Join Us</h3>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small class="text-danger">{{ field.errors.0 }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-brand mt-3">Create Account</button>
+        </form>
+        
+        <p class="text-center mt-4 small text-muted">
+            Already have an account? <a href="/" class="text-decoration-none fw-bold" style="color:#ff5a00;">Login</a>
+        </p>
+    </div>
+
+    <script>
+        var inputs = document.querySelectorAll('input');
+        inputs.forEach(function(input) {
+            input.classList.add('form-control');
+        });
+    </script>
+
+</body>
+</html>

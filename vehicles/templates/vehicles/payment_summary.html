@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Confirmation | Car Rental</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f7f6; padding-top: 50px; padding-bottom: 50px; }
+        .payment-card { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .summary-header { background: linear-gradient(45deg, #2c3e50, #34495e); color: white; padding: 30px; }
+        .price-badge { font-size: 1.8rem; font-weight: bold; color: #2ecc71; }
+        .detail-item { border-bottom: 1px solid #eee; padding: 15px 0; font-size: 1.1rem; }
+        .payment-section { background-color: #ffffff; padding: 30px; }
+        select, input { display: block; width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="card payment-card">
+                    <div class="summary-header text-center">
+                        <i class="fas fa-file-invoice-dollar fa-3x mb-3"></i>
+                        <h2 class="h3">Reservation Summary</h2>
+                    </div>
+
+                    <div class="payment-section">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold mb-1">{{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}</h3>
+                            <span class="badge bg-info text-dark px-3 py-2">{{ reservation.vehicle.vehicle_type }}</span>
+                        </div>
+
+                        <div class="detail-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-map-marker-alt me-2 text-primary"></i>Branch:</span>
+                            <span class="fw-bold">{{ reservation.branch }}</span>
+                        </div>
+                        <div class="detail-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-calendar-day me-2 text-primary"></i>Duration:</span>
+                            <span class="fw-bold">{{ duration }} Days</span>
+                        </div>
+                        <div class="detail-item d-flex justify-content-between align-items-center border-0">
+                            <span><i class="fas fa-tag me-2 text-primary"></i>Daily Rate:</span>
+                            <span class="fw-bold">${{ reservation.vehicle.daily_rate }}</span>
+                        </div>
+                        
+                        <div class="my-4 p-3 bg-light rounded shadow-sm d-flex justify-content-between align-items-center">
+                            <span class="h5 mb-0 fw-bold text-secondary">Total Amount:</span>
+                            <span class="price-badge">${{ total_cost }}</span>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <form method="post" id="payment-form">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">
+                                    <i class="fas fa-credit-card me-2 text-primary"></i>Payment Method
+                                </label>
+                                {{ form.payment_method }}
+                            </div>
+
+                            <div id="card-details-section">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark">Card Number</label>
+                                    {{ form.card_number }}
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold text-dark">Expiry Date</label>
+                                        {{ form.expiry_date }}
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold text-dark">CVV</label>
+                                        {{ form.cvv }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" id="submit-btn" class="btn btn-success btn-lg w-100 py-3 shadow border-0">
+                                <i class="fas fa-check-circle me-2"></i>CONFIRM PAYMENT NOW
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4 text-muted">
+                            <small><i class="fas fa-shield-alt me-1"></i> Secure Payment System</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const methodSelect = document.getElementById('id_payment_method');
+            const cardSection = document.getElementById('card-details-section');
+            const paymentForm = document.getElementById('payment-form');
+            const submitBtn = document.getElementById('submit-btn');
+
+            const cardInp = document.querySelector('input[name="card_number"]');
+            const expInp = document.querySelector('input[name="expiry_date"]');
+            const cvvInp = document.querySelector('input[name="cvv"]');
+
+            function toggleFields() {
+                if (methodSelect.value === 'Credit Card') {
+                    cardSection.style.display = 'block';
+                } else {
+                    cardSection.style.display = 'none';
+                }
+            }
+
+            cardInp.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/\D/g, '');
+                let m = v.match(/.{1,4}/g);
+                if (m) {
+                    e.target.value = m.join(' ').substring(0, 22);
+                } else {
+                    e.target.value = v;
+                }
+            });
+
+            expInp.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length > 2) {
+                    e.target.value = v.substring(0, 2) + '/' + v.substring(2, 4);
+                } else {
+                    e.target.value = v;
+                }
+                e.target.value = e.target.value.substring(0, 7);
+            });
+
+            cvvInp.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+            });
+
+            methodSelect.addEventListener('change', toggleFields);
+            toggleFields();
+
+            paymentForm.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            });
+        });
+    </script>
+</body>
+</html>
